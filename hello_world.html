@@ -1,271 +1,191 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة الأرقام</title>
+    <title>إدارة أرقام الواتساب</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
+            direction: rtl;
+            text-align: right;
+            margin: 20px;
         }
-        header {
-            background-color: #007BFF;
-            color: white;
-            text-align: center;
-            padding: 1rem;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+        table, th, td {
+            border: 1px solid #ddd;
         }
-        input, select, button {
-            width: calc(100% - 20px);
-            margin: 10px 10px 20px;
+        th, td {
             padding: 10px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .form-group {
+            margin-bottom: 15px;
         }
         button {
-            background-color: #007BFF;
+            padding: 10px 15px;
+            background-color: #28a745;
             color: white;
             border: none;
             cursor: pointer;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #218838;
         }
-        .number-list {
-            list-style: none;
-            padding: 0;
+        .delete-btn {
+            background-color: #dc3545;
         }
-        .number-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-        .number-item span {
-            font-size: 1rem;
-        }
-        .number-item button {
-            margin-left: 10px;
+        .delete-btn:hover {
+            background-color: #c82333;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>إدارة أرقام الواتساب</h1>
-    </header>
-    <div class="container">
-        <h2>إضافة رقم جديد</h2>
-        <input type="text" id="name" placeholder="اسم صاحب الرقم">
-        <input type="text" id="phone" placeholder="رقم الجوال">
-        <select id="category">
-            <option value="مطاعم">مطاعم</option>
-            <option value="مقاهي">مقاهي</option>
-            <option value="مكاتب">مكاتب</option>
-        </select>
-        <button onclick="addNumber()">إضافة الرقم</button>
 
-        <h2>الأرقام المضافة</h2>
-        <ul id="numberList" class="number-list"></ul>
+    <h1>إدارة أرقام الواتساب</h1>
+
+    <div>
+        <div class="form-group">
+            <label for="phoneNumber">رقم الواتساب:</label>
+            <input type="text" id="phoneNumber" placeholder="أدخل رقم الواتساب">
+        </div>
+        <div class="form-group">
+            <label for="category">التصنيف:</label>
+            <input type="text" id="category" placeholder="أدخل التصنيف (مثلاً مطاعم)">
+        </div>
+        <button onclick="addNumber()">إضافة الرقم</button>
     </div>
 
+    <h2>التصنيفات</h2>
+    <div id="categories">
+        <!-- سيتم إضافة الأزرار هنا -->
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>رقم الواتساب</th>
+                <th>التصنيف</th>
+                <th>مراسلة</th>
+                <th>تعديل</th>
+                <th>حذف</th>
+            </tr>
+        </thead>
+        <tbody id="numberTable">
+            <!-- سيتم إضافة الأرقام هنا -->
+        </tbody>
+    </table>
+
     <script>
-        const numbers = [];
+        const numberTable = document.getElementById('numberTable');
+        const categoriesDiv = document.getElementById('categories');
+        let categories = {};
+
+        // تحميل البيانات عند بدء التشغيل
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNumbers();
+        });
 
         function addNumber() {
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const category = document.getElementById('category').value;
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const category = document.getElementById('category').value.trim();
 
-            if (!name || !phone) {
-                alert('يرجى إدخال الاسم ورقم الجوال.');
+            if (!phoneNumber || !category) {
+                alert('يرجى إدخال جميع الحقول');
                 return;
             }
 
-            const number = { name, phone, category };
-            numbers.push(number);
-            renderNumbers();
-            clearInputs();
-        }
+            const numberData = { phoneNumber, category };
 
-        function renderNumbers() {
-            const list = document.getElementById('numberList');
-            list.innerHTML = '';
+            // حفظ البيانات
+            saveNumber(numberData);
 
-            numbers.forEach((number, index) => {
-                const item = document.createElement('li');
-                item.className = 'number-item';
-                item.innerHTML = `
-                    <span>${number.name} (${number.category}): ${number.phone}</span>
-                    <div>
-                        <button onclick="openWhatsApp('${number.phone}')">مراسلة</button>
-                        <button onclick="deleteNumber(${index})">حذف</button>
-                    </div>
-                `;
-                list.appendChild(item);
-            });
-        }
-
-        function openWhatsApp(phone) {
-            window.open(https://wa.me/${phone}, '_blank');
-        }
-
-        function deleteNumber(index) {
-            numbers.splice(index, 1);
-            renderNumbers();
-        }
-
-        function clearInputs() {
-            document.getElementById('name').value = '';
-            document.getElementById('phone').value = '';
-            document.getElementById('category').value = 'مطاعم';
-        }
-    </script>
-</body>
-</html> من هاتفي<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إدارة الأرقام</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
-        header {
-            background-color: #007BFF;
-            color: white;
-            text-align: center;
-            padding: 1rem;
-        }
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-        }
-        input, select, button {
-            width: calc(100% - 20px);
-            margin: 10px 10px 20px;
-            padding: 10px;
-            font-size: 1rem;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .number-list {
-            list-style: none;
-            padding: 0;
-        }
-        .number-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-        .number-item span {
-            font-size: 1rem;
-        }
-        .number-item button {
-            margin-left: 10px;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>إدارة أرقام الواتساب</h1>
-    </header>
-    <div class="container">
-        <h2>إضافة رقم جديد</h2>
-        <input type="text" id="name" placeholder="اسم صاحب الرقم">
-        <input type="text" id="phone" placeholder="رقم الجوال">
-        <select id="category">
-            <option value="مطاعم">مطاعم</option>
-            <option value="مقاهي">مقاهي</option>
-            <option value="مكاتب">مكاتب</option>
-        </select>
-        <button onclick="addNumber()">إضافة الرقم</button>
-
-        <h2>الأرقام المضافة</h2>
-        <ul id="numberList" class="number-list"></ul>
-    </div>
-
-    <script>
-        const numbers = [];
-
-        function addNumber() {
-            const name = document.getElementById('name').value;
-            const phone = document.getElementById('phone').value;
-            const category = document.getElementById('category').value;
-
-            if (!name || !phone) {
-                alert('يرجى إدخال الاسم ورقم الجوال.');
-                return;
+            // تحديث التصنيفات إذا لزم الأمر
+            if (!categories[category]) {
+                categories[category] = true;
+                addCategoryButton(category);
             }
 
-            const number = { name, phone, category };
-            numbers.push(number);
+            // إعادة تعيين الحقول
+            document.getElementById('phoneNumber').value = '';
+            document.getElementById('category').value = '';
+        }
+
+        function saveNumber(data) {
+            const numbers = JSON.parse(localStorage.getItem('numbers')) || [];
+            numbers.push(data);
+            localStorage.setItem('numbers', JSON.stringify(numbers));
             renderNumbers();
-            clearInputs();
+        }
+
+        function loadNumbers() {
+            const numbers = JSON.parse(localStorage.getItem('numbers')) || [];
+            numbers.forEach(number => {
+                if (!categories[number.category]) {
+                    categories[number.category] = true;
+                    addCategoryButton(number.category);
+                }
+            });
+            renderNumbers();
         }
 
         function renderNumbers() {
-            const list = document.getElementById('numberList');
-            list.innerHTML = '';
-
+            numberTable.innerHTML = '';
+            const numbers = JSON.parse(localStorage.getItem('numbers')) || [];
             numbers.forEach((number, index) => {
-                const item = document.createElement('li');
-                item.className = 'number-item';
-                item.innerHTML = `
-                    <span>${number.name} (${number.category}): ${number.phone}</span>
-                    <div>
-                        <button onclick="openWhatsApp('${number.phone}')">مراسلة</button>
-                        <button onclick="deleteNumber(${index})">حذف</button>
-                    </div>
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${number.phoneNumber}</td>
+                    <td>${number.category}</td>
+                    <td><a href="https://wa.me/${number.phoneNumber}" target="_blank">مراسلة</a></td>
+                    <td><button onclick="editNumber(${index})">تعديل</button></td>
+                    <td><button class="delete-btn" onclick="deleteNumber(${index})">حذف</button></td>
                 `;
-                list.appendChild(item);
+                numberTable.appendChild(row);
             });
         }
 
-        function openWhatsApp(phone) {
-            window.open(https://wa.me/${phone}, '_blank');
+        function addCategoryButton(category) {
+            const button = document.createElement('button');
+            button.textContent = category;
+            button.onclick = () => filterByCategory(category);
+            categoriesDiv.appendChild(button);
+        }
+
+        function filterByCategory(category) {
+            const rows = numberTable.querySelectorAll('tr');
+            const numbers = JSON.parse(localStorage.getItem('numbers')) || [];
+            rows.forEach((row, index) => {
+                if (numbers[index].category === category) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
         }
 
         function deleteNumber(index) {
+            const numbers = JSON.parse(localStorage.getItem('numbers')) || [];
             numbers.splice(index, 1);
+            localStorage.setItem('numbers', JSON.stringify(numbers));
             renderNumbers();
         }
 
-        function clearInputs() {
-            document.getElementById('name').value = '';
-            document.getElementById('phone').value = '';
-            document.getElementById('category').value = 'مطاعم';
+        function editNumber(index) {
+            const numbers = JSON.parse(localStorage.getItem('numbers')) || [];
+            const number = numbers[index];
+            document.getElementById('phoneNumber').value = number.phoneNumber;
+            document.getElementById('category').value = number.category;
+            deleteNumber(index);
         }
     </script>
+
 </body>
-</html
+</html>
